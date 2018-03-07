@@ -12,7 +12,8 @@
     "lite": "lite-server",
     "playground:build": "tsc -p playground -w",
     "playground": "concurrently \"npm run build:watch\" \"npm run playground:build\" \"npm run lite\"",
-    "test": "tsc && karma start"
+    "test": "tsc && karma start",
+    "publocal": "npm run build && cd dist && npm link && cd .. && cd .. && cd project-bar && npm link && cd .. && cd mf-ng2-chart"
   },
   "repository": {
     "type": "git",
@@ -71,5 +72,8 @@
   },
   "engines": {
     "node": ">=6.0.0"
+  },
+  "dependencies": {
+    "d3": "^4.13.0"
   }
 }
