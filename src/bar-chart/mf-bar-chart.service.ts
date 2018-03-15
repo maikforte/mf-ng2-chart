@@ -1,11 +1,14 @@
 import { Injectable } from '@angular/core';
 import * as d3 from 'd3';
+// import * as selection from 'd3-selection';
 import * as _ from 'underscore';
 
 import { MfBarChartComparator } from './mf-bar-chart-comparator.model';
 import { MfBarChartData } from './mf-bar-chart-data.model';
 
 const MARGIN = 5;
+const COMPARATOR_X = 40;
+const DATA_LIST_X = COMPARATOR_X + 30;
 
 @Injectable()
 export class MfBarChartService {
@@ -21,14 +24,14 @@ export class MfBarChartService {
   public createBarChart(element: string, comparators: Array<MfBarChartComparator>, data: Array<MfBarChartData>, options?: any): void {
     options = this.configureOptions(options);
     options['comparatorDistance'] = (options.chartHeight - (MARGIN * 2)) / comparators.length;
-    options['dataListDistance'] = (options.chartWidth - (MARGIN * 2)) / data.length;
+    options['dataListDistance'] = (options.chartWidth - DATA_LIST_X - (MARGIN * 2)) / data.length;
     this.setParentElement(element);
     this.clearChart(element);
     this.setSvgSize(0, 0, options.chartWidth, options.chartHeight);
-    this.generateChartBox(options.chartWidth, options.chartHeight);
-    this.generateComparator(comparators, options.chartHeight, options.comparatorDistance, options.chartWidth);
-    this.generateDataList(data, options.dataListX, options.chartHeight, options.dataListDistance);
-    this.generateBars(data, comparators, options.dataListX, options.chartHeight, options.barWidth, options.dataListDistance, options.comparatorDistance);
+    this.generateChartBox(options.borderStrokeWidth, options.chartWidth, options.chartHeight);
+    this.generateComparator(comparators, COMPARATOR_X, options.chartHeight, options.comparatorStrokeWidth, options.comparatorDistance, options.chartWidth);
+    this.generateDataList(data, DATA_LIST_X, options.chartHeight, options.dataListDistance);
+    this.generateBars(data, comparators, DATA_LIST_X, options.chartHeight, options.barWidth, options.dataListDistance, options.comparatorDistance);
   }
 
   public clearChart(element: string): void {
@@ -43,8 +46,9 @@ export class MfBarChartService {
     const defaults = {
       chartHeight: 200,
       chartWidth: 300,
-      dataListX: 50,
-      barWidth: 20
+      barWidth: 20,
+      comparatorStrokeWidth: 1,
+      borderStrokeWidth: 2
     };
 
     return this.setDefaults(options, defaults);
@@ -54,36 +58,37 @@ export class MfBarChartService {
     this.svg.attr('viewBox', `${miny} ${minx} ${width + (MARGIN * 2)} ${height + (MARGIN * 2)}`);
   }
 
-  private generateChartBox(width: number, height: number): void {
+  private generateChartBox(borderStrokeWidth: number, width: number, height: number): void {
     this.svg
       .append('rect')
       .attr('x', MARGIN)
       .attr('y', MARGIN)
       .attr('height', height - (MARGIN * 2))
       .attr('width', width - (MARGIN * 2))
-      .attr('stroke-width', '2')
+      .attr('stroke-width', borderStrokeWidth)
       .attr('opacity', '.5')
       .attr('fill', 'rgba(0,0,0,0)')
       .attr('stroke', 'rgba(0,0,0,1)');
   }
 
-  private generateComparator(comparators: Array<MfBarChartComparator>, y: number, heightInterval: number, width: number): void {
+  private generateComparator(comparators: Array<MfBarChartComparator>, x: number, y: number, strokeWidth: number, heightInterval: number, width: number): void {
     comparators.reverse();
     const LINE_END = width - (MARGIN * 2);
     let comparatorY = y - (MARGIN * 5);
     for (let i = comparators.length - 1; i >= 0; i -- ) {
       this.svg
       .append('line')
-      .attr('x1', 30)
+      .attr('x1', MARGIN)
       .attr('y1', comparatorY)
       .attr('x2', LINE_END)
       .attr('y2', comparatorY)
+      .attr('stroke-width', strokeWidth)
       .attr('stroke', 'rgba(0,0,0,.05)');
 
       this.svg
       .append('text')
       .text(comparators[i].label)
-      .attr('x', 30)
+      .attr('x', x)
       .attr('y', comparatorY)
       .attr('text-anchor', 'end');
       comparatorY -= heightInterval;
@@ -136,22 +141,20 @@ export class MfBarChartService {
         .attr('width', barWidth)
         .attr('height', data[i].barHeight)
         .attr('fill', '#2196F3')
-        .attr('opacity', .5);
+        .attr('opacity', .5)
+        .on('mouseover', this.onBarMouseOver)
+        .on('mouseout', this.onBarMouseOut);
       x += widthInterval;
     }
   }
 
   private onBarMouseOver(d, i, e) {
-    d3.select(`rect#${e[0].id}`)
-    .style({
-      'opacity' : 1
-    });
+    d3.select(this)
+    .style('opacity', 1);
   }
 
   private onBarMouseOut(d, i, e) {
-    d3.select(`rect#${e[0].id}`)
-    .style({
-      'opacity' : .5
-    });
+    d3.select(this)
+    .style('opacity', .5);
   }
 }

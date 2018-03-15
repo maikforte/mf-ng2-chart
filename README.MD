@@ -77,9 +77,11 @@ MfBarChartService.createBarChart(<your_svg: string>,
 #### Sample Options
 ```typescript
 options = {
-  chartHeight: 200 // Defaults to 200
-  chartWidth: 300 // Defaults to 300,
-  barWidth: 20 // Defaults to 20
+  chartHeight: 200, // Defaults to 200
+  chartWidth: 300, // Defaults to 300
+  barWidth: 20, // Defaults to 20
+  comparatorStrokeWidth: 1, // Defaults to 1. 0 for none
+  borderStrokeWidth: 2 // Defaults to 2. 0 for none
 }
 ```
 <br>
