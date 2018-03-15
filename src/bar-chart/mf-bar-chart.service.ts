@@ -23,14 +23,14 @@ export class MfBarChartService {
 
   public createBarChart(element: string, comparators: Array<MfBarChartComparator>, data: Array<MfBarChartData>, options?: any): void {
     options = this.configureOptions(options);
-    options['comparatorDistance'] = (options.chartHeight - (MARGIN * 2)) / comparators.length;
+    options['comparatorDistance'] = (options.chartHeight - (MARGIN * 7)) / comparators.length;
     options['dataListDistance'] = (options.chartWidth - DATA_LIST_X - (MARGIN * 2)) / data.length;
     this.setParentElement(element);
     this.clearChart(element);
     this.setSvgSize(0, 0, options.chartWidth, options.chartHeight);
     this.generateChartBox(options.borderStrokeWidth, options.chartWidth, options.chartHeight);
-    this.generateComparator(comparators, COMPARATOR_X, options.chartHeight, options.comparatorStrokeWidth, options.comparatorDistance, options.chartWidth);
-    this.generateDataList(data, DATA_LIST_X, options.chartHeight, options.dataListDistance);
+    this.generateComparator(comparators, COMPARATOR_X, options.chartHeight, options.comparatorStrokeWidth, options.comparatorDistance, options.chartWidth, options.comparatorFontSize);
+    this.generateDataList(data, DATA_LIST_X, options.chartHeight, options.dataListDistance, options.dataFontSize);
     this.generateBars(data, comparators, DATA_LIST_X, options.chartHeight, options.barWidth, options.dataListDistance, options.comparatorDistance);
   }
 
@@ -48,7 +48,9 @@ export class MfBarChartService {
       chartWidth: 300,
       barWidth: 20,
       comparatorStrokeWidth: 1,
-      borderStrokeWidth: 2
+      comparatorFontSize: 12,
+      borderStrokeWidth: 2,
+      dataFontSize: 12
     };
 
     return this.setDefaults(options, defaults);
@@ -71,7 +73,7 @@ export class MfBarChartService {
       .attr('stroke', 'rgba(0,0,0,1)');
   }
 
-  private generateComparator(comparators: Array<MfBarChartComparator>, x: number, y: number, strokeWidth: number, heightInterval: number, width: number): void {
+  private generateComparator(comparators: Array<MfBarChartComparator>, x: number, y: number, strokeWidth: number, heightInterval: number, width: number, fontSize: number): void {
     comparators.reverse();
     const LINE_END = width - (MARGIN * 2);
     let comparatorY = y - (MARGIN * 5);
@@ -90,12 +92,13 @@ export class MfBarChartService {
       .text(comparators[i].label)
       .attr('x', x)
       .attr('y', comparatorY)
-      .attr('text-anchor', 'end');
+      .attr('text-anchor', 'end')
+      .style('font-size', fontSize);
       comparatorY -= heightInterval;
     }
   }
 
-  private generateDataList(data: Array<MfBarChartData>, x: number, y: number, widthInterval: number): void {
+  private generateDataList(data: Array<MfBarChartData>, x: number, y: number, widthInterval: number, fontSize: number): void {
     const DATALIST_Y = y - (MARGIN * 2);
     for (let i = 0; i < data.length; i ++) {
       this.svg
@@ -103,7 +106,8 @@ export class MfBarChartService {
       .text(data[i].label)
       .attr('x', x)
       .attr('y', DATALIST_Y)
-      .attr('text-anchor', 'middle');
+      .attr('text-anchor', 'middle')
+      .style('font-size', fontSize);
 
       x += widthInterval;
     }
