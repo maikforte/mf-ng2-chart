@@ -123,8 +123,12 @@ export class MfBarChartService {
             const equalComparator = data[dataIndex].value === comparators[comparatorIndex].value
                                     ? true
                                     : false;
-            const range = Math.abs(comparators[comparatorIndex - 1].value - comparators[comparatorIndex].value);
-            const denominator = heightInterval / range;
+            const range = comparatorIndex > 0
+                          ? Math.abs(comparators[comparatorIndex - 1].value - comparators[comparatorIndex].value)
+                          : 0;
+            const denominator = range > 0
+                                ? heightInterval / range
+                                : 0;
             const difference = equalComparator
                           ? 0
                           : Math.abs(comparators[comparatorIndex].value - data[dataIndex].value);
