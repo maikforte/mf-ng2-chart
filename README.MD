@@ -37,6 +37,7 @@ import { MfBarChartService } from 'mf-ng2-chart';
 providers: [MfBarChartService]
 ```
 <br>
+
 On your Angular `AppComponent`, import `MfBarChartService`, `MfBarChartComparator`, and `MfBarChartData`.
 
 ```typescript
@@ -118,7 +119,6 @@ export class AppComponent implements OnInit {
 
 }
 ```
-<br>
 
 ## License
 
