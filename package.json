@@ -1,6 +1,6 @@
 {
   "name": "mf-ng2-chart",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "scripts": {
     "build": "gulp build",
     "build:watch": "gulp",
@@ -24,7 +24,10 @@
     "email": "michael.ardan2000@gmail.com"
   },
   "keywords": [
-    "angular"
+    "angular",
+    "chart",
+    "mf-ng2-chart",
+    "d3"
   ],
   "license": "MIT",
   "bugs": {
