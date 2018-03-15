@@ -119,6 +119,7 @@ export class AppComponent implements OnInit {
 }
 ```
 <br>
+
 ## License
 
 MIT © [Michael Ardan](mailto:michael.ardan2000@gmail.com)
