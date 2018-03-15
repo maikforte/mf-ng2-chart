@@ -5,6 +5,8 @@ import * as _ from 'underscore';
 import { MfBarChartComparator } from './mf-bar-chart-comparator.model';
 import { MfBarChartData } from './mf-bar-chart-data.model';
 
+const MARGIN = 5;
+
 @Injectable()
 export class MfBarChartService {
 
@@ -18,16 +20,15 @@ export class MfBarChartService {
 
   public createBarChart(element: string, comparators: Array<MfBarChartComparator>, data: Array<MfBarChartData>, options?: any): void {
     options = this.configureOptions(options);
-    options['comparatorDistance'] = options.maxChartHeight / comparators.length;
-    options['dataListDistance'] = options.maxChartWidth / data.length;
-    options['barY'] = options.comparatorY;
+    options['comparatorDistance'] = (options.chartHeight - (MARGIN * 2)) / comparators.length;
+    options['dataListDistance'] = (options.chartWidth - (MARGIN * 2)) / data.length;
     this.setParentElement(element);
     this.clearChart(element);
-    this.setSvgSize(0, 0, options.viewBoxWidth, options.viewBoxHeight);
-    this.generateChartBox(options.chartContainerX, options.chartContainerY, options.chartContainerWidth, options.chartContainerHeight);
-    this.generateComparator(comparators, options.comparatorY, options.comparatorDistance);
-    this.generateDataList(data, options.dataListX, options.dataListY, options.dataListDistance);
-    this.generateBars(data, comparators, options.dataListX, options.barY, options.barWidth, options.dataListDistance, options.comparatorDistance);
+    this.setSvgSize(0, 0, options.chartWidth, options.chartHeight);
+    this.generateChartBox(options.chartWidth, options.chartHeight);
+    this.generateComparator(comparators, options.chartHeight, options.comparatorDistance, options.chartWidth);
+    this.generateDataList(data, options.dataListX, options.chartHeight, options.dataListDistance);
+    this.generateBars(data, comparators, options.dataListX, options.chartHeight, options.barWidth, options.dataListDistance, options.comparatorDistance);
   }
 
   public clearChart(element: string): void {
@@ -40,17 +41,9 @@ export class MfBarChartService {
 
   private configureOptions(options): any {
     const defaults = {
-      maxChartHeight: 200,
-      maxChartWidth: 300,
-      viewBoxHeight: 400,
-      viewBoxWidth: 400,
-      chartContainerX: 5,
-      chartContainerY: 5,
-      chartContainerHeight: 200,
-      chartContainerWidth: 300,
-      comparatorY: 180,
+      chartHeight: 200,
+      chartWidth: 300,
       dataListX: 50,
-      dataListY: 200,
       barWidth: 20
     };
 
@@ -58,50 +51,53 @@ export class MfBarChartService {
   }
 
   private setSvgSize(minx: number, miny: number, width: number, height: number): void {
-    this.svg.attr('viewBox', `${miny} ${minx} ${width} ${height}`);
+    this.svg.attr('viewBox', `${miny} ${minx} ${width + (MARGIN * 2)} ${height + (MARGIN * 2)}`);
   }
 
-  private generateChartBox(x: number, y: number, width: number, height: number): void {
+  private generateChartBox(width: number, height: number): void {
     this.svg
       .append('rect')
-      .attr('x', x)
-      .attr('y', y)
-      .attr('height', height)
-      .attr('width', width)
+      .attr('x', MARGIN)
+      .attr('y', MARGIN)
+      .attr('height', height - (MARGIN * 2))
+      .attr('width', width - (MARGIN * 2))
       .attr('stroke-width', '2')
       .attr('opacity', '.5')
       .attr('fill', 'rgba(0,0,0,0)')
       .attr('stroke', 'rgba(0,0,0,1)');
   }
 
-  private generateComparator(comparators: Array<MfBarChartComparator>, y: number, heightInterval: number): void {
+  private generateComparator(comparators: Array<MfBarChartComparator>, y: number, heightInterval: number, width: number): void {
     comparators.reverse();
+    const LINE_END = width - (MARGIN * 2);
+    let comparatorY = y - (MARGIN * 5);
     for (let i = comparators.length - 1; i >= 0; i -- ) {
       this.svg
       .append('line')
       .attr('x1', 30)
-      .attr('y1', y)
-      .attr('x2', 300)
-      .attr('y2', y)
+      .attr('y1', comparatorY)
+      .attr('x2', LINE_END)
+      .attr('y2', comparatorY)
       .attr('stroke', 'rgba(0,0,0,.05)');
 
       this.svg
       .append('text')
-      .text(comparators[i].value)
+      .text(comparators[i].label)
       .attr('x', 30)
-      .attr('y', y)
+      .attr('y', comparatorY)
       .attr('text-anchor', 'end');
-      y -= heightInterval;
+      comparatorY -= heightInterval;
     }
   }
 
   private generateDataList(data: Array<MfBarChartData>, x: number, y: number, widthInterval: number): void {
+    const DATALIST_Y = y - (MARGIN * 2);
     for (let i = 0; i < data.length; i ++) {
       this.svg
       .append('text')
       .text(data[i].label)
       .attr('x', x)
-      .attr('y', y)
+      .attr('y', DATALIST_Y)
       .attr('text-anchor', 'middle');
 
       x += widthInterval;
@@ -110,6 +106,7 @@ export class MfBarChartService {
 
   private generateBars(data: Array<MfBarChartData>, comparators: Array<MfBarChartComparator>, x: number, y: number, barWidth: number, widthInterval: number, heightInterval: number): void {
     comparators.reverse();
+    const COMPARATOR_Y = y - (MARGIN * 5);
     for (let dataIndex = 0; dataIndex < data.length; dataIndex++) {
       innerLoop:
       for (let comparatorIndex = 0; comparatorIndex < comparators.length; comparatorIndex ++) {
@@ -133,7 +130,7 @@ export class MfBarChartService {
         .append('rect')
         .attr('id', `bar${i + 1}`)
         .attr('x', x - (barWidth / 2.5))
-        .attr('y', y - (data[i].barHeight
+        .attr('y', COMPARATOR_Y - (data[i].barHeight
                         ? data[i].barHeight
                         : 0))
         .attr('width', barWidth)
