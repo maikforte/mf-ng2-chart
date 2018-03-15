@@ -79,9 +79,11 @@ MfBarChartService.createBarChart(<your_svg: string>,
 options = {
   chartHeight: 200, // Defaults to 200
   chartWidth: 300, // Defaults to 300
-  barWidth: 20, // Defaults to 20
-  comparatorStrokeWidth: 1, // Defaults to 1. 0 for none
-  borderStrokeWidth: 2 // Defaults to 2. 0 for none
+  barWidth: 20, // In pixels. Defaults to 20
+  comparatorStrokeWidth: 1, // In pixels. Defaults to 1. 0 for none
+  borderStrokeWidth: 2 // In pixels. Defaults to 2. 0 for none
+  comparatorFontSize: 5 // In pixels. Defaults to 12,
+  dataFontSize: 5 // In pixels. Defaults to 12
 }
 ```
 <br>
